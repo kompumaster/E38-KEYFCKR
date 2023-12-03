@@ -7,7 +7,7 @@ by Flash/Tune (https://t.me/obd2help)
 
 ![AcDelco E38 Pinout](pinout/AcDelco_E38_Pinout.png)
 
-- PP.  Use x32 Python (3.12)
+- PP.  Use Windows and Python 3.12 x32
 - PPS.Code written by my monkey danсing on the keyboard
 
 
