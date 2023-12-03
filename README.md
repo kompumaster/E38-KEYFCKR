@@ -21,6 +21,7 @@ Script has 6 phases:
 Script have settings:
 - runForward - Key from 0000 to FFFF, or backward
 - swapByte - Swap high and low Key Byte (0001, 0002 ... or 0100, 0200 ...)
+
 and some more. Look inside.
 
 
