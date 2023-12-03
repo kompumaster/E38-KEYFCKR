@@ -23,7 +23,7 @@ from J2534.Define import *
 
 ## -------------------------------------- Default Settings ------------------------------------- ##
 
-devIndex = 2  # index of default J2534 interface
+devIndex = 999  # index of default J2534 interface
 logfile = 'E38-KEYFCKR.log'
 powerPause = 0.5  # pause between power off and on
 seedPause = 0.5  # pause between askSeed commands
