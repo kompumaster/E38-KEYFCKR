@@ -78,9 +78,9 @@ class Logger(object):
 
 sys.stdout = Logger()
 
+J2534.SetErrorLog(showErr)
 ProtoISO = ProtocolID.ISO15765
 ProtoCAN = ProtocolID.CAN
-J2534.SetErrorLog(showErr)
 
 so_file = os.path.dirname(__file__) + "\\gm-seed-key-so\\gm-seed-key.so"  # connect GM algo's Key gen
 so = CDLL(so_file)
