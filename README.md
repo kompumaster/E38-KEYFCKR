@@ -1,6 +1,6 @@
 # GM AcDelco ECU "E38 KeyFCKR"
 
-by Flash/Tune (https://t.me/obd2help)
+by [Flash/Tune](https://t.me/obd2help)
 
 # ** TESTING NEEDED!!!  **
 
