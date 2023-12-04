@@ -2,7 +2,7 @@
 
 by [Flash/Tune](https://t.me/obd2help)
 
-# ** TESTING NEEDED!!!  **
+# **TESTING NEEDED!!!**
 
 - 2 bytes Seed Key brutforce tester (via J2534 device).
 - Power control - LLine (pin15). Use PowerBox or similar devce.
