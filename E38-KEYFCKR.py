@@ -215,7 +215,7 @@ def tryKey(highK, lowK):
 
 	# 00 00 07 e8 03 [7f 27 35] - Invalid Key
         if msgRx.Data[5] == 0x7F and msgRx.Data[6] == 0x27 and msgRx.Data[7] == 0x35:
-            print(' WRONG...')
+            print(' WRONG')
             keyAnswer = True
             return False
 
