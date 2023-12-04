@@ -197,23 +197,29 @@ def tryKey(highK, lowK):
 
     while not keyAnswer:
         msgRx = sendCAN([0x04, 0x27, 0x02, highK, lowK, 0x00, 0x00, 0x00])
-        if msgRx.Data[4] == 0x02 and msgRx.Data[5] == 0x67 and msgRx.Data[6] == 0x02:
+
+	# 00 00 07 e8 02 [67 02] - Key accepted
+        if msgRx.Data[5] == 0x67 and msgRx.Data[6] == 0x02:
             os.system('color A')
             print(' CORRECT (!!!!!!)')
             print(dtn(), '<< ' + strMsg(msgRx.Data, msgRx.DataSize))
             keyAnswer = True
             return True
-	# 
-        if msgRx.Data[4] == 0x03 and msgRx.Data[5] == 0x7F and msgRx.Data[6] == 0x27:
+
+	# 00 00 07 e8 03 [7f 27 35] - Invalid Key
+        if msgRx.Data[5] == 0x7F and msgRx.Data[6] == 0x27 and msgRx.Data[6] == 0x35:
             print(' WRONG...')
             keyAnswer = True
             return False
-        else:
-            print('.', end='')
-            clrbCAN()
-            time.sleep(seedPause)
-            if showErr:
-                print(dtn(), '<<', strMsg(msgRx.Data, msgRx.DataSize))
+
+	# 00 00 07 e8 03 [7f 27 37] - Time Delay not Expired
+	# 00 00 07 e8 03 [7f 27 22] - ?
+   
+        print('.', end='')
+        clrbCAN()
+        time.sleep(seedPause)
+        if showErr:
+            print(dtn(), '<<', strMsg(msgRx.Data, msgRx.DataSize))
 
 
 def printECUid(name, msg):  # convert ECU id message to int value
