@@ -24,7 +24,7 @@ from J2534.Define import *
 ## -------------------------------------- Default Settings ------------------------------------- ##
 
 devIndex = 999  # index of default J2534 interface
-defaultKeyAlgo = 0x92 # Default algo for E38 ECU (proto gmlan)
+defaultKeyAlgo = 0x92  # Default algo for E38 ECU (proto gmlan)
 showErr = False  # Show debug info
 powerPause = 0.5  # pause between power off and on
 seedPause = 0.5  # pause between askSeed commands
@@ -59,10 +59,13 @@ cfg['DEFAULT'] = {'ikeyLast': str(ikBeg),
                   'bkeyLast': str(bkeyLast),
                   'phase': str(0)}
 
+
 def dtn():
     return str(datetime.datetime.now())[:-4]
 
-logfile = 'logs\\'+ dtn().replace(':','_')[:-3] +' E38-KEYFCKR.log'
+
+logfile = 'logs\\' + dtn().replace(':', '_')[:-3] + ' E38-KEYFCKR.log'
+
 
 class Logger(object):
     def __init__(self, filename=logfile):
@@ -107,6 +110,11 @@ def bytes(num):  # Split "word" to high and low byte
     return num >> 8, num & 0xFF
 
 
+def mirrorByte(num):  # "mirror" byte order (12 -> 21)
+    mirrorHexStr = hex(num)[2:][1] + hex(num)[2:][0]
+    return int(mirrorHexStr, 16)
+
+
 def addZ(s, n):  # add "0" x n in begining of hex value
     while len(s) < n:
         s = '0' + s
@@ -148,31 +156,32 @@ def sendCAN(msgTxData):  # Send message via CAN
     return msgRx
 
 
-def startDiag(): # start diagnostic session
+def startDiag():  # start diagnostic session
     msgRx = sendCAN([0x02, 0x10, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00])
-    if msgRx.Data[4] == 0x01 and  msgRx.Data[5] == 0x50:
+    if msgRx.Data[4] == 0x01 and msgRx.Data[5] == 0x50:
         return True
     else:
         return False
 
-def disableComm(): # disable normal communication
+
+def disableComm():  # disable normal communication
     msgRx = sendCAN([0x01, 0x28, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00])
-    if msgRx.Data[4] == 0x01 and  msgRx.Data[5] == 0x68:
+    if msgRx.Data[4] == 0x01 and msgRx.Data[5] == 0x68:
         return True
     else:
         return False
 
 
 def askSeed():  # Asking the Seed
-	
+
     print(dtn(), 'Start diag ', end='')
-    while not startDiag(): # Wait for start diagnostic
+    while not startDiag():  # Wait for start diagnostic
         time.sleep(seedPause)
         print('.', end='')
     print('')
 
     print(dtn(), 'Disable comm. ', end='')
-    while not disableComm(): # wait for disable communication
+    while not disableComm():  # wait for disable communication
         time.sleep(seedPause)
         print('.', end='')
     print('')
@@ -183,13 +192,13 @@ def askSeed():  # Asking the Seed
     while aseed == 0:
         msgRx = sendCAN([0x02, 0x27, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00])
 
-	# 00 00 07 e8 04 [67 01] XX XX - Seed
+        # 00 00 07 e8 04 [67 01] XX XX - Seed
         if msgRx.Data[5] == 0x67 and msgRx.Data[6] == 0x01:
             aseed = msgRx.Data[7] * 256 + msgRx.Data[8]
             print(' = ' + addZ(hex(aseed)[2:], 4))
             return aseed
 
-	# 00 00 07 e8 03 [7f 27 37] - Time Delay not Expired
+        # 00 00 07 e8 03 [7f 27 37] - Time Delay not Expired
         if msgRx.Data[5] == 0x7F and msgRx.Data[6] == 0x27 and msgRx.Data[7] == 0x37:
             clrbCAN()
             time.sleep(seedPause)
@@ -200,13 +209,12 @@ def askSeed():  # Asking the Seed
 
 
 def tryKey(highK, lowK):
-
     keyAnswer = False
 
     while not keyAnswer:
         msgRx = sendCAN([0x04, 0x27, 0x02, highK, lowK, 0x00, 0x00, 0x00])
 
-	# 00 00 07 e8 02 [67 02] - Key accepted
+        # 00 00 07 e8 02 [67 02] - Key accepted
         if msgRx.Data[5] == 0x67 and msgRx.Data[6] == 0x02:
             os.system('color A')
             print(' CORRECT (!!!!!!)')
@@ -214,15 +222,15 @@ def tryKey(highK, lowK):
             keyAnswer = True
             return True
 
-	# 00 00 07 e8 03 [7f 27 35] - Invalid Key
+        # 00 00 07 e8 03 [7f 27 35] - Invalid Key
         if msgRx.Data[5] == 0x7F and msgRx.Data[6] == 0x27 and msgRx.Data[7] == 0x35:
             print(' WRONG')
             keyAnswer = True
             return False
 
-	# 00 00 07 e8 03 [7f 27 37] - Time Delay not Expired
-	# 00 00 07 e8 03 [7f 27 22] - ?
-   
+        # 00 00 07 e8 03 [7f 27 37] - Time Delay not Expired
+        # 00 00 07 e8 03 [7f 27 22] - ?
+
         print('.', end='')
         clrbCAN()
         time.sleep(seedPause)
@@ -283,7 +291,7 @@ for id in devices:  # List of J2534 devices
         print('  ', end='')
     print(id + 1, devices[id])
     path = devices[id]['FunctionLibrary'].rsplit('\\', 1)[0] + '\\'
-    os.add_dll_directory(path) # Add .dll path to python searh for dependencies
+    os.add_dll_directory(path)  # Add .dll path to python searh for dependencies
 
 while not devIndex in range(1, len(devices) + 1):  # if default devIndex not in list - choose device
     print('Select: ', end='')
@@ -393,16 +401,16 @@ if phase == 0:
 
 ## --------------------------------- Phase 1-3 - try all algo ---------------------------------- ##
 
-while phase in range(1, 3 +1):
+while phase in range(1, 3 + 1):
     if phase == 1:
         keyAll = keyAllgmlan
-        print(dtn(), '[ Phase', phase,'- try all GMlan algo ]')
+        print(dtn(), '[ Phase', phase, '- try all GMlan algo ]')
     if phase == 2:
         keyAll = keyAllclass2
-        print(dtn(), '[ Phase', phase,'- try all class2 algo ]')
+        print(dtn(), '[ Phase', phase, '- try all class2 algo ]')
     if phase == 3:
         keyAll = keyAllothers
-        print(dtn(), '[ Phase', phase,'- try all other algo ]')
+        print(dtn(), '[ Phase', phase, '- try all other algo ]')
 
     startTime = time.time()
     algoLastLast = algoLast
@@ -411,11 +419,11 @@ while phase in range(1, 3 +1):
 
         ikey = keyAll[algo]
 
-        if ikey == keyDefault: # Skip default Key
+        if ikey == keyDefault:  # Skip default Key
             continue
-        if phase == 2 and ikey in keyAllgmlan: # skip gmlan keys on phase 2
+        if phase == 2 and ikey in keyAllgmlan:  # skip gmlan keys on phase 2
             continue
-        if phase == 3 and (ikey in keyAllgmlan or ikey in keyAllclass2): # skip gmlan and class2 keys on phase 3
+        if phase == 3 and (ikey in keyAllgmlan or ikey in keyAllclass2):  # skip gmlan and class2 keys on phase 3
             continue
 
         powerOn()
@@ -439,9 +447,9 @@ while phase in range(1, 3 +1):
         if (algo - algoLastLast + 1) % 5 == 0 and algo > algoLastLast:
             runTime = (time.time() - startTime)
             estSec = (runTime / (algo - algoLastLast + 1) * (256 - algo))
-            print(dtn(), 'Tested now:', (algo - algoLastLast + 1), 'total:', algo+1, 'keys from', 256)
+            print(dtn(), 'Tested now:', (algo - algoLastLast + 1), 'total:', algo + 1, 'keys from', 256)
             print(dtn(), 'Runing time:', str(datetime.timedelta(seconds=runTime // 1)), end='')
-            print(' // Est:', str(datetime.timedelta(seconds=estSec // 1)), '( phase',phase,')')
+            print(' // Est:', str(datetime.timedelta(seconds=estSec // 1)), '( phase', phase, ')')
 
     phase += 1
     algoLast = 0
@@ -454,7 +462,7 @@ while phase in range(1, 3 +1):
 
 if phase == 4:
 
-    print(dtn(), '[ Phase', phase,'- same High and Low byte ]')
+    print(dtn(), '[ Phase', phase, '- same High and Low byte ]')
 
     startTime = time.time()
     bkeyLastLast = bkeyLast
@@ -464,7 +472,7 @@ if phase == 4:
         low = bkey
         high = low
         ikey = (high << 8) + low
-        if ikey in keyAllgmlan or ikey in keyAllclass2 or ikey in keyAllothers or ikey == keyDefault: # skip algo and default keys
+        if ikey in keyAllgmlan or ikey in keyAllclass2 or ikey in keyAllothers or ikey == keyDefault:  # skip algo and default keys
             continue
 
         powerOn()
@@ -490,7 +498,7 @@ if phase == 4:
             estSec = (runTime / (bkey - bkeyLastLast + 1) * (256 - bkey))
             print(dtn(), 'Tested now:', (bkey - bkeyLastLast + 1), 'total:', bkey + 1, 'keys from', 256)
             print(dtn(), 'Runing time:', str(datetime.timedelta(seconds=runTime // 1)), end='')
-            print(' // Est:', str(datetime.timedelta(seconds=estSec // 1)), '( phase',phase,')')
+            print(' // Est:', str(datetime.timedelta(seconds=estSec // 1)), '( phase', phase, ')')
 
     phase = 5
     clrbCAN()
@@ -500,7 +508,7 @@ if phase == 4:
 
 ## ----------------------------------- Phase 5 - Bruteforce ------------------------------------ ##
 
-print(dtn(), '[ Phase', phase,'- Bruteforce ]')
+print(dtn(), '[ Phase', phase, '- Bruteforce ]')
 
 startTime = time.time()
 ikeyLastLast = ikeyLast
@@ -533,9 +541,9 @@ for ikey in range(ikeyLast, ikEnd, ikEnc):
         time.sleep(powerPause)
 
     if runForward:
-        ikeysPass = (ikey - ikeyLastLast)+1
+        ikeysPass = (ikey - ikeyLastLast) + 1
     else:
-        ikeysPass = (ikeyLastLast - ikey)+1
+        ikeysPass = (ikeyLastLast - ikey) + 1
 
     if (ikeysPass % 5 == 0  # Calculate run and time left.
             and ikeysPass > 5
@@ -544,13 +552,13 @@ for ikey in range(ikeyLast, ikEnd, ikEnc):
         runTime = (time.time() - startTime)
         if runForward:
             leftSec = (runTime / ikeysPass * (ikEnd - ikey) / ikEnc)
-            print(dtn(), 'Tested now:', ikeysPass, 'total:', ikey+1, 'keys from', ikEnd+1)
+            print(dtn(), 'Tested now:', ikeysPass, 'total:', ikey + 1, 'keys from', ikEnd + 1)
         else:
             leftSec = abs(runTime / ikeysPass * (ikey - ikEnd) / ikEnc)
-            print(dtn(), 'Tested now:', ikeysPass, 'total:', ikBeg - ikey+1, 'keys from', ikBeg+1)
+            print(dtn(), 'Tested now:', ikeysPass, 'total:', ikBeg - ikey + 1, 'keys from', ikBeg + 1)
 
         print(dtn(), 'Runing time:', str(datetime.timedelta(seconds=runTime // 1)), end='')
-        print(' // Left:', str(datetime.timedelta(seconds=leftSec // 1)), '( phase',phase,')')
+        print(' // Left:', str(datetime.timedelta(seconds=leftSec // 1)), '( phase', phase, ')')
 
 ## ---------------------------------------- Program END ---------------------------------------- ##
 
