@@ -181,14 +181,21 @@ def askSeed():  # Asking the Seed
     aseed = 0
     while aseed == 0:
         msgRx = sendCAN([0x02, 0x27, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00])
-        if msgRx.Data[5] == 0x67:  # Answer was correct
+
+	# 00 00 07 e8 04 [67 01] XX XX - Seed
+        if msgRx.Data[5] == 0x67 and msgRx.Data[6] == 0x01:
             aseed = msgRx.Data[7] * 256 + msgRx.Data[8]
             print(' = ' + addZ(hex(aseed)[2:], 4))
             return aseed
-        else:
+
+	# 00 00 07 e8 03 [7f 27 37] - Time Delay not Expired
+        if msgRx.Data[5] == 0x7F and msgRx.Data[6] == 0x27 and msgRx.Data[7] == 0x37:
             clrbCAN()
             time.sleep(seedPause)
             print('.', end='')
+        else:
+            clrbCAN()
+            print(',', end='')
 
 
 def tryKey(highK, lowK):
@@ -207,7 +214,7 @@ def tryKey(highK, lowK):
             return True
 
 	# 00 00 07 e8 03 [7f 27 35] - Invalid Key
-        if msgRx.Data[5] == 0x7F and msgRx.Data[6] == 0x27 and msgRx.Data[6] == 0x35:
+        if msgRx.Data[5] == 0x7F and msgRx.Data[6] == 0x27 and msgRx.Data[7] == 0x35:
             print(' WRONG...')
             keyAnswer = True
             return False
