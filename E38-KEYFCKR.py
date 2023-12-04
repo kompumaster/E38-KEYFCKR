@@ -208,7 +208,8 @@ def tryKey(highK, lowK):
             keyAnswer = True
             return False
         else:
-            print('Ask...', end='')
+            print('.', end='')
+            clrbCAN()
             time.sleep(seedPause)
             if showErr:
                 print(dtn(), '<<', strMsg(msgRx.Data, msgRx.DataSize))
@@ -359,10 +360,6 @@ for algo in range(000, 256):
     keyAllothers.append(abs(so.get_key(seed, algo, 3)))
 
 keyDefault = keyAllgmlan[0x92]
-
-clrbCAN()
-powerOff()
-time.sleep(powerPause)
 
 ## ---------------------------------- Phase 0 - Default KEY ------------------------------------ ##
 
