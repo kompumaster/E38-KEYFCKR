@@ -12,9 +12,9 @@ by [Flash/Tune](https://t.me/obd2help)
 
 Script has 6 phases:
 - **0** - Defaut Key
-- **1** - All keys in "Gmlan" algo
-- **2** - All keys in "class2" algo
-- **3** - All keys in "others" algo
+- **1** - All algo keys in "Gmlan" proto
+- **2** - All algo keys in "class2" proto
+- **3** - All algo keys in "others" proto
 - **4** - All keys with same hi-lo byte (0101, 0202 ...)
 - **5** - Bruteforce **all** 65536 keys
 
