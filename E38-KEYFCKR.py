@@ -192,15 +192,26 @@ def askSeed():  # Asking the Seed
 
 
 def tryKey(highK, lowK):
-    msgRx = sendCAN([0x04, 0x27, 0x02, highK, lowK, 0x00, 0x00, 0x00])
-    if msgRx.Data[4] == 0x02 and msgRx.Data[5] == 0x67 and msgRx.Data[4] == 0x02:
-        os.system('color A')
-        print(' CORRECT (!!!!!!)')
-        print(dtn(), '<< ' + strMsg(msgRx.Data, msgRx.DataSize))
-        return True
-    else:
-        print(' WRONG...')
-        return False
+
+    keyAnswer = False
+
+    while not keyAnswer:
+        msgRx = sendCAN([0x04, 0x27, 0x02, highK, lowK, 0x00, 0x00, 0x00])
+        if msgRx.Data[4] == 0x02 and msgRx.Data[5] == 0x67 and msgRx.Data[6] == 0x02:
+            os.system('color A')
+            print(' CORRECT (!!!!!!)')
+            print(dtn(), '<< ' + strMsg(msgRx.Data, msgRx.DataSize))
+            keyAnswer = True
+            return True
+        if msgRx.Data[4] == 0x03 and msgRx.Data[5] == 0x7F and msgRx.Data[6] == 0x27 and msgRx.Data[7] == 0x35:
+            print(' WRONG...')
+            keyAnswer = True
+            return False
+        else:
+            print('Ask...', end='')
+            time.sleep(seedPause)
+            if showErr:
+                print(dtn(), '<<', strMsg(msgRx.Data, msgRx.DataSize))
 
 
 def printECUid(name, msg):  # convert ECU id message to int value
@@ -343,9 +354,9 @@ keyAllothers = []
 
 seed = askSeed()
 for algo in range(000, 256):
-    keyAllgmlan.append(abs(so.get_key_gmlan(seed, algo, 1)))
-    keyAllclass2.append(abs(so.get_key_gmlan(seed, algo, 2)))
-    keyAllothers.append(abs(so.get_key_gmlan(seed, algo, 3)))
+    keyAllgmlan.append(abs(so.get_key(seed, algo, 1)))
+    keyAllclass2.append(abs(so.get_key(seed, algo, 2)))
+    keyAllothers.append(abs(so.get_key(seed, algo, 3)))
 
 keyDefault = keyAllgmlan[0x92]
 
