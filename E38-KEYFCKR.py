@@ -203,7 +203,8 @@ def tryKey(highK, lowK):
             print(dtn(), '<< ' + strMsg(msgRx.Data, msgRx.DataSize))
             keyAnswer = True
             return True
-        if msgRx.Data[4] == 0x03 and msgRx.Data[5] == 0x7F and msgRx.Data[6] == 0x27 and msgRx.Data[7] == 0x35:
+	# 
+        if msgRx.Data[4] == 0x03 and msgRx.Data[5] == 0x7F and msgRx.Data[6] == 0x27:
             print(' WRONG...')
             keyAnswer = True
             return False
