@@ -545,4 +545,3 @@ clrbCAN()
 powerOff()
 J2534.ptDisconnect(chISO)
 J2534.ptClose(deviceID)
-# Wow! Only 497 lines.
