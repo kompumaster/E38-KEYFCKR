@@ -246,8 +246,8 @@ for id in devices:  # List of J2534 devices
     else:
         print('  ', end='')
     print(id + 1, devices[id])
-path = devices[id]['FunctionLibrary'].rsplit('\\', 1)[0] + '\\'
-os.add_dll_directory(path) # Add .dll path to python searh for dependencies
+    path = devices[id]['FunctionLibrary'].rsplit('\\', 1)[0] + '\\'
+    os.add_dll_directory(path) # Add .dll path to python searh for dependencies
 
 while not devIndex in range(1, len(devices) + 1):  # if default devIndex not in list - choose device
     print('Select: ', end='')
