@@ -247,7 +247,7 @@ for id in devices:  # List of J2534 devices
         print('  ', end='')
     print(id + 1, devices[id])
 path = devices[id]['FunctionLibrary'].rsplit('\\', 1)[0] + '\\'
-os.add_dll_directory(path)
+os.add_dll_directory(path) # Add .dll path to python searh for dependencies
 
 while not devIndex in range(1, len(devices) + 1):  # if default devIndex not in list - choose device
     print('Select: ', end='')
@@ -321,6 +321,8 @@ if os.path.exists('history\\' + VIN + '.last.ini'):
     print('Last key:', addZ(hex(ikeyLast)[2:], 4), '\nStart key:', addZ(hex(ikBeg)[2:], 4), '\nEnd key:',
           addZ(hex(ikEnd)[2:], 4), '\nStep:', ikEnc, '\nswapByte:', swapByte, '\nalgoLast:', algoLast, '\nbkeyLast:',
           bkeyLast, '\nphase:', phase)
+else:
+    print(dtn(), '[ Begin from scratch (no config file) ]')
 
 ## --------------------------------- Generate Seed-Key list ------------------------------------ ##
 
