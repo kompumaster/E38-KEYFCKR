@@ -111,8 +111,8 @@ def bytes(num):  # Split "word" to high and low byte
 
 
 def mirrorByte(num):  # "mirror" byte order (12 -> 21)
-    mirrorHexStr = hex(num)[2:][1] + hex(num)[2:][0]
-    return int(mirrorHexStr, 16)
+    mHexStr = addZ(hex(num)[2:], 2)
+    return int(mHexStr[1] + mHexStr[0], 16)
 
 
 def addZ(s, n):  # add "0" x n in begining of hex value
@@ -399,9 +399,24 @@ if phase == 0:
     saveCfg()
     time.sleep(powerPause)
 
-## --------------------------------- Phase 1-3 - try all algo ---------------------------------- ##
+## ---------------------------------- Phase 1 - Seed = KEY ------------------------------------ ##
 
-while phase in range(1, 3 + 1):
+if phase == 1:
+    print(dtn(), '[ Phase 1 - Seed = KEY ]')
+    print(dtn(), 'Default Key = ', hex(keyDefault)[2:], end='')
+    high, low = bytes(keyDefault)
+    if tryKey(high, low):
+        exit(0)
+
+    phase = 1
+    clrbCAN()
+    powerOff()
+    saveCfg()
+    time.sleep(powerPause)
+
+## --------------------------------- Phase 2-4 - try all algo ---------------------------------- ##
+
+while phase in range(2, 4 + 1):
     if phase == 1:
         keyAll = keyAllgmlan
         print(dtn(), '[ Phase', phase, '- try all GMlan algo ]')
@@ -421,9 +436,11 @@ while phase in range(1, 3 + 1):
 
         if ikey == keyDefault:  # Skip default Key
             continue
-        if phase == 2 and ikey in keyAllgmlan:  # skip gmlan keys on phase 2
+        if ikey == seed:  # Skip Seed = Key
             continue
-        if phase == 3 and (ikey in keyAllgmlan or ikey in keyAllclass2):  # skip gmlan and class2 keys on phase 3
+        if phase == 3 and ikey in keyAllgmlan:  # skip gmlan keys on phase 2
+            continue
+        if phase == 4 and (ikey in keyAllgmlan or ikey in keyAllclass2):  # skip gmlan and class2 keys on phase 3
             continue
 
         powerOn()
@@ -458,9 +475,9 @@ while phase in range(1, 3 + 1):
     saveCfg()
     time.sleep(powerPause)
 
-## ---------------------------------- Phase 4 - same High and Low byte ----------------------------------- ##
+## ------------------- Phase 5, 6 - same High and Low byte and Mirror hi/lo byte --------------------- ##
 
-if phase == 4:
+while phase in range(4, 5 + 1):
 
     print(dtn(), '[ Phase', phase, '- same High and Low byte ]')
 
@@ -469,10 +486,21 @@ if phase == 4:
 
     for bkey in range(bkeyLast, 256):
 
-        low = bkey
-        high = low
-        ikey = (high << 8) + low
-        if ikey in keyAllgmlan or ikey in keyAllclass2 or ikey in keyAllothers or ikey == keyDefault:  # skip algo and default keys
+        if phase == 4:
+            low = bkey
+            high = bkey
+        if phase == 5:
+            low = bkey
+            high = mirrorByte(bkey)
+            if low == high: # skip phase 4 keys
+                continue
+
+        currKey = (high << 8) + low
+        if (currKey == keyDefault
+                or currKey == seed
+                or currKey in keyAllgmlan
+                or currKey in keyAllclass2
+                or currKey in keyAllothers):  # skip algo and default keys
             continue
 
         powerOn()
@@ -500,13 +528,14 @@ if phase == 4:
             print(dtn(), 'Runing time:', str(datetime.timedelta(seconds=runTime // 1)), end='')
             print(' // Est:', str(datetime.timedelta(seconds=estSec // 1)), '( phase', phase, ')')
 
-    phase = 5
+    phase += 1
+    bkeyLast = 0
     clrbCAN()
     powerOff()
     saveCfg()
     time.sleep(powerPause)
 
-## ----------------------------------- Phase 5 - Bruteforce ------------------------------------ ##
+## ----------------------------------- Phase 6 - Bruteforce ------------------------------------ ##
 
 print(dtn(), '[ Phase', phase, '- Bruteforce ]')
 
@@ -520,11 +549,14 @@ for ikey in range(ikeyLast, ikEnd, ikEnc):
     else:
         low, high = bytes(ikey)  # high и low changed!
 
-    if (((high << 8) + low) in keyAllgmlan  # check Key repeat in 1-4 phase
-            or ((high << 8) + low) in keyAllclass2
-            or ((high << 8) + low) in keyAllothers
+    currKey = ((high << 8) + low)
+    if (currKey in keyAllgmlan  # check Key repeat in 0-5 phase
+            or currKey in keyAllclass2
+            or currKey in keyAllothers
             or high == low
-            or ((high << 8) + low) == keyDefault): continue
+            or high == mirrorByte(low)
+            or currKey == keyDefault
+            or currKey == seed): continue
 
     powerOn()
     seed = askSeed()
@@ -562,7 +594,7 @@ for ikey in range(ikeyLast, ikEnd, ikEnc):
 
 ## ---------------------------------------- Program END ---------------------------------------- ##
 
-phase = 6  # We have't phase 6. So, we can not find Seed Key.
+phase += 1 # We have't phase 6. So, we can not find Seed Key.
 saveCfg()
 clrbCAN()
 powerOff()

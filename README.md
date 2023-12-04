@@ -23,11 +23,13 @@ Features:
 
 Script has 6 phases:
 - **0** - Defaut Key
-- **1** - All algo keys in "gmlan" proto
-- **2** - All algo keys in "class2" proto
-- **3** - All algo keys in "others" proto
-- **4** - All keys with same hi-lo byte (0101, 0202 ...)
-- **5** - Bruteforce **all** 65536 keys
+- **1** - Key = Seed
+- **2** - All algo keys in "gmlan" proto
+- **3** - All algo keys in "class2" proto
+- **4** - All algo keys in "others" proto
+- **5** - All keys with same hi-lo byte (0101, 0202 ...)
+- **6** - All keys with mirror hi-lo byte (0110, 0220 ...)
+- **7** - Bruteforce **all** 65536 keys
 
 Script have settings:
 - runForward - Key from 0000 to FFFF, or backward
