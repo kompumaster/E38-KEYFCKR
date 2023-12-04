@@ -27,7 +27,7 @@ and some more. Look inside.
 
 Curren progress saves in "history\\%VIN%.last.ini" file.
 
-- PP.  Use Windows and Python 3.12 x32
+- PS.  Use Windows and Python 3.12 x32
 - PPS.Code written by my monkey danсing on the keyboard
 
 
