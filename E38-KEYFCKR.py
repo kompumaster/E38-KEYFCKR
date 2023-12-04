@@ -165,12 +165,23 @@ def disableComm(): # disable normal communication
 def askSeed():  # Asking the Seed
 	
 
+
+    print(dtn(), 'Start diag ', end='')
+    while not startDiag(): # Wait for start diagnostic
+        time.sleep(seedPause)
+        print('.', end='')
+    print('')
+
+    print(dtn(), 'Disable comm. ', end='')
+    while not disableComm(): # wait for disable communication
+        time.sleep(seedPause)
+        print('.', end='')
+    print('')
+
     print(dtn(), 'ASK SEED ', end='')
 
     aseed = 0
     while aseed == 0:
-        startDiag()
-        disableComm()
         msgRx = sendCAN([0x02, 0x27, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00])
         if msgRx.Data[5] == 0x67:  # Answer was correct
             aseed = msgRx.Data[7] * 256 + msgRx.Data[8]
@@ -431,7 +442,7 @@ if phase == 4:
         low = bkey
         high = low
         ikey = (high << 8) + low
-        if ikey in keyAllgmlan or ikey in keyAllclass2 or ikey in keyAllothers:
+        if ikey in keyAllgmlan or ikey in keyAllclass2 or ikey in keyAllothers or ikey == keyDefault: # skip algo and default keys
             continue
 
         powerOn()
@@ -482,7 +493,8 @@ for ikey in range(ikeyLast, ikEnd, ikEnc):
     if (((high << 8) + low) in keyAllgmlan  # check Key repeat in 1-4 phase
             or ((high << 8) + low) in keyAllclass2
             or ((high << 8) + low) in keyAllothers
-            or high == low): continue
+            or high == low
+            or ((high << 8) + low) == keyDefault): continue
 
     powerOn()
     seed = askSeed()
