@@ -21,7 +21,7 @@ Features:
 ![AcDelco E38 Pinout](pinout/AcDelco_E38_Pinout.png)
 
 
-Script has 6 phases:
+Script has 8 phases:
 - **0** - Defaut Key
 - **1** - Key = Seed
 - **2** - All algo keys in "gmlan" proto
