@@ -377,10 +377,19 @@ while phase in range(1, 3):
 
     for algo in range(algoLast, 256):
 
+        ikey = keyAll[algo]
+
+        if ikey == keyDefault: # Skip default Key
+            continue
+        if phase == 2 and ikey in keyAllgmlan: # skip gmlan keys on phase 2
+            continue
+        if phase == 3 and (ikey in keyAllgmlan or ikey in keyAllclass2): # skip gmlan and class2 keys on phase 3
+            continue
+
         powerOn()
         seed = askSeed()
 
-        high, low = bytes(keyAll[algo])
+        high, low = bytes(ikey)
         print(dtn(), 'Algo:', addZ(str(algo), 3), 'KEY: ' + addZ(hex(high)[2:], 2) + addZ(hex(low)[2:], 2), end='')
 
         if tryKey(high, low):
