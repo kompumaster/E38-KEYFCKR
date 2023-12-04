@@ -24,13 +24,12 @@ from J2534.Define import *
 ## -------------------------------------- Default Settings ------------------------------------- ##
 
 devIndex = 999  # index of default J2534 interface
-logfile = 'E38-KEYFCKR.log'
+showErr = False  # Show debug info
 powerPause = 0.5  # pause between power off and on
 seedPause = 0.5  # pause between askSeed commands
 phase = 0  # 0 = default key, 1 = 256 standard algos, 2 = bruteforce
 runForward = False  # Key from 0000 to FFFF, or backward
 swapByte = True  # Swap high and low Key Byte
-showErr = False  # Show debug info
 
 cfg = configparser.ConfigParser()
 
@@ -59,6 +58,10 @@ cfg['DEFAULT'] = {'ikeyLast': str(ikBeg),
                   'bkeyLast': str(bkeyLast),
                   'phase': str(0)}
 
+def dtn():
+    return str(datetime.datetime.now())[:-4]
+
+logfile = 'logs\\'+ dtn().replace(':','_')[:-3] +' E38-KEYFCKR.log'
 
 class Logger(object):
     def __init__(self, filename=logfile):
@@ -87,9 +90,6 @@ so = CDLL(so_file)
 
 
 ## ------------------------------------------- SUBs -------------------------------------------- ##
-
-def dtn():
-    return str(datetime.datetime.now())[:-4]
 
 
 def clrbCAN():  # clear CAN buffer
@@ -147,10 +147,30 @@ def sendCAN(msgTxData):  # Send message via CAN
     return msgRx
 
 
+def startDiag(): # start diagnostic session
+    msgRx = sendCAN([0x02, 0x10, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00])
+    if msgRx.Data[4] == 0x01 and  msgRx.Data[5] == 0x50:
+        return True
+    else:
+        return False
+
+def disableComm(): # disable normal communication
+    msgRx = sendCAN([0x01, 0x28, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00])
+    if msgRx.Data[4] == 0x01 and  msgRx.Data[5] == 0x68:
+        return True
+    else:
+        return False
+
+
 def askSeed():  # Asking the Seed
+	
+
     print(dtn(), 'ASK SEED ', end='')
+
     aseed = 0
     while aseed == 0:
+        startDiag()
+        disableComm()
         msgRx = sendCAN([0x02, 0x27, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00])
         if msgRx.Data[5] == 0x67:  # Answer was correct
             aseed = msgRx.Data[7] * 256 + msgRx.Data[8]
@@ -163,8 +183,8 @@ def askSeed():  # Asking the Seed
 
 
 def tryKey(highK, lowK):
-    msgRx = sendCAN([0x02, 0x27, 0x02, highK, lowK, 0x00, 0x00, 0x00])
-    if msgRx.Data[5] == 0x67:
+    msgRx = sendCAN([0x04, 0x27, 0x02, highK, lowK, 0x00, 0x00, 0x00])
+    if msgRx.Data[4] == 0x02 and msgRx.Data[5] == 0x67 and msgRx.Data[4] == 0x02:
         os.system('color A')
         print(' CORRECT (!!!!!!)')
         print(dtn(), '<< ' + strMsg(msgRx.Data, msgRx.DataSize))
