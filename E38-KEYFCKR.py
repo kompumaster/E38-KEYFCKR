@@ -164,8 +164,6 @@ def disableComm(): # disable normal communication
 
 def askSeed():  # Asking the Seed
 	
-
-
     print(dtn(), 'Start diag ', end='')
     while not startDiag(): # Wait for start diagnostic
         time.sleep(seedPause)
@@ -372,7 +370,7 @@ if phase == 0:
 
 ## --------------------------------- Phase 1-3 - try all algo ---------------------------------- ##
 
-while phase in range(1, 3):
+while phase in range(1, 3 +1):
     if phase == 1:
         keyAll = keyAllgmlan
         print(dtn(), '[ Phase', phase,'- try all GMlan algo ]')
@@ -386,7 +384,7 @@ while phase in range(1, 3):
     startTime = time.time()
     algoLastLast = algoLast
 
-    for algo in range(algoLast, 256):
+    for algo in range(algoLastLast, 256):
 
         ikey = keyAll[algo]
 
@@ -423,6 +421,7 @@ while phase in range(1, 3):
             print(' // Est:', str(datetime.timedelta(seconds=estSec // 1)), '( phase',phase,')')
 
     phase += 1
+    algoLast = 0
     clrbCAN()
     powerOff()
     saveCfg()
