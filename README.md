@@ -17,6 +17,7 @@ Features:
 - 2 bytes Seed Key brutforce tester (via J2534 device).
 - Power control - LLine (pin15). Use PowerBox or similar devce.
 
+
 ![AcDelco E38 Pinout](pinout/AcDelco_E38_Pinout.png)
 
 
