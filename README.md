@@ -32,5 +32,5 @@ Curren progress saves in "history\\%VIN%.last.ini" file.
 
 
 Used:
-- J2534 modified lib from https://github.com/NPYK/python_j2534
-- gm-seed-key modified from https://github.com/YustasSwamp/gm-seed-key
+- [NPYK J2534 modified lib](https://github.com/NPYK/python_j2534)
+- [YustasSwamp gm-seed-key modified to .so](https://github.com/YustasSwamp/gm-seed-key)
