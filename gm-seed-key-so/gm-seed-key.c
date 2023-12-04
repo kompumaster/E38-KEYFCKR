@@ -91,7 +91,7 @@ static unsigned short op_f8(unsigned short val, unsigned char hh, unsigned char 
 	return val - (((unsigned short)ll << 8) | hh);
 }
 
-unsigned short get_key_gmlan(unsigned short seed, unsigned char algo, unsigned char proto)
+unsigned short get_key(unsigned short seed, unsigned char algo, unsigned char proto)
 {
 	int idx, i;
 	unsigned char hh, ll, code;
@@ -153,4 +153,65 @@ unsigned short get_key_gmlan(unsigned short seed, unsigned char algo, unsigned c
 		idx += 3;
 	}
 	return seed;
+}
+
+int main(int argc, char **argv)
+{
+	unsigned char  algo = 0;
+	unsigned short seed = 0;
+	unsigned char  proto = 0;
+	unsigned char  algo_max = 0xff;
+	unsigned short seed_max = 0xffff;
+	int a, c;
+
+	while ((c = getopt (argc, argv, "a:s:p:h")) != -1)
+		switch (c) {
+			case 'a':
+				algo = algo_max = strtol(optarg, NULL, 16);
+				if (algo > 255 || algo < 0) {
+					fprintf (stderr, "Algo should by in [0x00:0xff] range.\n");
+					return 1;
+				}
+				break;
+			case 's':
+				seed = seed_max = strtol(optarg, NULL, 16);
+				if (seed > 0xffff || seed < 0) {
+					fprintf (stderr, "Seed should by in [0x0000:0xffff] range.\n");
+					return 1;
+				}
+				break;
+			case 'p':
+				proto = strtol(optarg, NULL, 16);
+				if (proto != 1 && proto != 2 && proto != 3) {
+					fprintf (stderr, "Protocol should be one of: 1=gmlan, 2=class2, 3=others.\n");
+					return 1;
+				}
+				break;
+			case 'h':
+			default:
+				printf("Usage: %s <-a algo> <-s seed> <-p protocol>\n", argv[0]);
+				printf("Print key(s) for provided algo, seed and protocol.\n\n");
+				printf(" -a <algo>     Algorithm to use. Hex value in the range [00:ff].\n");
+				printf("               If not provided - will print the keys for all algos.\n");
+				printf(" -s <seed>     Input seed. Hex value in the range [0000:ffff].\n");
+				printf("               If not provided - will print the keys for all seeds.\n");
+				printf(" -p <protocol> Protocol to use. Acceptable vlues 1=gmlan, 2=class2, 3=others.\n");
+				printf("               Default protocol is 1=gmlan.\n");
+				return 0;
+		}
+
+#ifdef WITH_TESTS
+	int i;
+	for (i = 0; i < sizeof(tests) / sizeof(tests[0]); i++)
+		if (tests[i][2] != get_key(tests[i][1], tests[i][0], table))
+			printf("key(%2x, %4x) != %4x\n", tests[i][0],
+				tests[i][1], tests[i][2]);
+#endif
+
+	for (; seed <= seed_max; seed++)
+		for (a = algo; a <= algo_max; a++)
+			printf("%04x %2x %04x\n",
+				(unsigned short)seed, (unsigned char)a,
+				get_key ((unsigned short)seed, (unsigned char)a, (unsigned char)proto));
+	return 0;
 }
