@@ -24,6 +24,7 @@ from J2534.Define import *
 ## -------------------------------------- Default Settings ------------------------------------- ##
 
 devIndex = 999  # index of default J2534 interface
+defaultKeyAlgo = 0x92 # Default algo for E38 ECU (proto gmlan)
 showErr = False  # Show debug info
 powerPause = 0.5  # pause between power off and on
 seedPause = 0.5  # pause between askSeed commands
@@ -373,7 +374,7 @@ for algo in range(000, 256):
     keyAllclass2.append(abs(so.get_key(seed, algo, 2)))
     keyAllothers.append(abs(so.get_key(seed, algo, 3)))
 
-keyDefault = keyAllgmlan[0x92]
+keyDefault = keyAllgmlan[defaultKeyAlgo]
 
 ## ---------------------------------- Phase 0 - Default KEY ------------------------------------ ##
 
