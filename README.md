@@ -4,6 +4,15 @@ by [Flash/Tune](https://t.me/obd2help)
 
 # **TESTING NEEDED!!!**
 
+
+intro:
+A long time ago,
+in a galaxy far, far away..
+The E38 unit came into my hands after the EEPROM was damaged. The Seed/Key pair was irretrievably lost, the standard one did not fit... after about a couple of days (or rather nights), this script was born.
+
+
+
+Features:
 - 2 bytes Seed Key brutforce tester (via J2534 device).
 - Power control - LLine (pin15). Use PowerBox or similar devce.
 
