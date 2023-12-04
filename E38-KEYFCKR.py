@@ -198,6 +198,8 @@ def askSeed():  # Asking the Seed
             print(' = ' + addZ(hex(aseed)[2:], 4))
             return aseed
 
+        # 00 00 07 e8 01 60 aa aa aa aa aa aa - ????
+
         # 00 00 07 e8 03 [7f 27 37] - Time Delay not Expired
         if msgRx.Data[5] == 0x7F and msgRx.Data[6] == 0x27 and msgRx.Data[7] == 0x37:
             clrbCAN()
