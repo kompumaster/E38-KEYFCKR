@@ -23,7 +23,7 @@ Features:
 
 Script has 6 phases:
 - **0** - Defaut Key
-- **1** - All algo keys in "Gmlan" proto
+- **1** - All algo keys in "gmlan" proto
 - **2** - All algo keys in "class2" proto
 - **3** - All algo keys in "others" proto
 - **4** - All keys with same hi-lo byte (0101, 0202 ...)
