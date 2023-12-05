@@ -551,7 +551,11 @@ for ikey in range(ikeyLast, ikEnd, ikEnc):
     else:
         low, high = bytes(ikey)  # high и low changed!
 
-    if phase == 8: # we already did it, and dont find seed key :-( 
+    if phase == 8: # we already did it, and dont find seed key :-(
+        print('All phase completed. Key not found.') 
+        print('(damaged ECU? Bad connection? Bugs in this bruteforcer?)') 
+        print('To run again - delete:') 
+        print('history\\' + VIN + '.last.ini') 
         break
 
     currKey = ((high << 8) + low)
