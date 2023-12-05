@@ -96,16 +96,6 @@ so = CDLL(so_file)
 ## ------------------------------------------- SUBs -------------------------------------------- ##
 
 
-def clrbCAN():  # clear CAN buffer
-    J2534.ClearRxBuf(chCAN)
-    J2534.ClearTxBuf(chCAN)
-
-
-def clrbISO():  # clear ISO buffer
-    J2534.ClearRxBuf(chISO)
-    J2534.ClearTxBuf(chISO)
-
-
 def bytes(num):  # Split "word" to high and low byte
     return num >> 8, num & 0xFF
 
@@ -127,6 +117,65 @@ def strMsg(msg, msgLen):  # message to Hex
         hexbyte = hex(msg[x])[2:]
         s = s + addZ(hexbyte, 2) + ' '
     return s.upper()
+
+
+def printECUid(name, msg):  # convert ECU id message to int value
+    s = ''
+    id = 0
+    for i in range(6, msg.DataSize):
+        if msg.Data[6] > 0: s = s + hex(msg.Data[i])[2:]
+    if len(s) > 0:
+        id = int(s, 16)
+        print(dtn(), name, id)
+    return id
+
+
+def printECUidStr(name, msg):  # convert ECU id message to string value
+    s = ''
+    for i in range(6, msg.DataSize):
+        if msg.Data[i] > 0: s = s + chr(msg.Data[i]).upper()
+    if len(s) > 0: print(dtn(), name, s)
+    return s
+
+
+def readCfg(cfgFile):  # oh yea, save config
+    cfg.read(cfgFile)
+    global ikeyLast, ikBeg, ikEnd, ikEnc, swapByte, runForward, algoLast, bkeyLast, phase
+    ikeyLast = int(cfg.get('DEFAULT', 'ikeyLast'))
+    ikBeg = int(cfg.get('DEFAULT', 'ikBeg'))
+    ikEnd = int(cfg.get('DEFAULT', 'ikEnd'))
+    ikEnc = int(cfg.get('DEFAULT', 'ikEnc'))
+    swapByte = eval(cfg.get('DEFAULT', 'swapByte'))
+    algoLast = int(cfg.get('DEFAULT', 'algoLast'))
+    bkeyLast = int(cfg.get('DEFAULT', 'bkeyLast'))
+    phase = int(cfg.get('DEFAULT', 'phase'))
+    if ikEnc > 0: 
+        runForward = True
+    else:
+        runForward = False
+
+
+def saveCfg():  # oh yea, save config
+    cfg.set('DEFAULT', 'ikeyLast', str(ikeyLast))
+    cfg.set('DEFAULT', 'ikBeg', str(ikBeg))
+    cfg.set('DEFAULT', 'ikEnd', str(ikEnd))
+    cfg.set('DEFAULT', 'ikEnc', str(ikEnc))
+    cfg.set('DEFAULT', 'swapByte', str(swapByte))
+    cfg.set('DEFAULT', 'algoLast', str(algoLast))
+    cfg.set('DEFAULT', 'bkeyLast', str(bkeyLast))
+    cfg.set('DEFAULT', 'phase', str(phase))
+    with open('history\\' + VIN + '.last.ini', 'w') as config_file:
+        cfg.write(config_file)
+
+
+def clrbCAN():  # clear CAN buffer
+    J2534.ClearRxBuf(chCAN)
+    J2534.ClearTxBuf(chCAN)
+
+
+def clrbISO():  # clear ISO buffer
+    J2534.ClearRxBuf(chISO)
+    J2534.ClearTxBuf(chISO)
 
 
 def sendISO(msgTxData, msgNum):  # Send message via ISO
@@ -276,38 +325,6 @@ def tryKey(highK, lowK):
             print(dtn(), '<<', strMsg(msgRx.Data, msgRx.DataSize))
 
 
-def printECUid(name, msg):  # convert ECU id message to int value
-    s = ''
-    id = 0
-    for i in range(6, msg.DataSize):
-        if msg.Data[6] > 0: s = s + hex(msg.Data[i])[2:]
-    if len(s) > 0:
-        id = int(s, 16)
-        print(dtn(), name, id)
-    return id
-
-
-def printECUidStr(name, msg):  # convert ECU id message to string value
-    s = ''
-    for i in range(6, msg.DataSize):
-        if msg.Data[i] > 0: s = s + chr(msg.Data[i]).upper()
-    if len(s) > 0: print(dtn(), name, s)
-    return s
-
-
-def saveCfg():  # oh yea, save config
-    cfg.set('DEFAULT', 'ikeyLast', str(ikeyLast))
-    cfg.set('DEFAULT', 'ikBeg', str(ikBeg))
-    cfg.set('DEFAULT', 'ikEnd', str(ikEnd))
-    cfg.set('DEFAULT', 'ikEnc', str(ikEnc))
-    cfg.set('DEFAULT', 'swapByte', str(swapByte))
-    cfg.set('DEFAULT', 'algoLast', str(algoLast))
-    cfg.set('DEFAULT', 'bkeyLast', str(bkeyLast))
-    cfg.set('DEFAULT', 'phase', str(phase))
-    with open('history\\' + VIN + '.last.ini', 'w') as config_file:
-        cfg.write(config_file)
-
-
 def powerOn():
     J2534.ptSetProgrammingVoltage(deviceID, 15, -2)
 
@@ -387,22 +404,15 @@ J2534.ptStartMsgFilter(chCAN, FilterType.PASS_FILTER, maskMsg, patternMsg, flowc
 
 if not os.path.exists('history'):
     os.mkdir('history')
-if os.path.exists('history\\' + VIN + '.last.ini'):
-    cfg.read('history\\' + VIN + '.last.ini')
-    ikeyLast = int(cfg.get('DEFAULT', 'ikeyLast'))
-    ikBeg = int(cfg.get('DEFAULT', 'ikBeg'))
-    ikEnd = int(cfg.get('DEFAULT', 'ikEnd'))
-    ikEnc = int(cfg.get('DEFAULT', 'ikEnc'))
-    swapByte = eval(cfg.get('DEFAULT', 'swapByte'))
-    algoLast = int(cfg.get('DEFAULT', 'algoLast'))
-    bkeyLast = int(cfg.get('DEFAULT', 'bkeyLast'))
-    phase = int(cfg.get('DEFAULT', 'phase'))
-    if ikEnc > 0: runForward = True;
 
-    print(dtn(), '[ Read settings from:', 'history\\' + VIN + '.last.ini ]')
+cfgFileName = 'history\\' + VIN + '.last.ini'
+if os.path.exists(cfgFileName):
+    readCfg(cfgFileName)
+
+    print(dtn(), '[ Read settings from:', cfgFileName, ']')
     print('Last key:', addZ(hex(ikeyLast)[2:], 4), '\nStart key:', addZ(hex(ikBeg)[2:], 4), '\nEnd key:',
-          addZ(hex(ikEnd)[2:], 4), '\nStep:', ikEnc, '\nswapByte:', swapByte, '\nalgoLast:', algoLast, '\nbkeyLast:',
-          bkeyLast, '\nphase:', phase)
+          addZ(hex(ikEnd)[2:], 4), '\nStep:', ikEnc, '\nswapByte:', swapByte,'\nrunForward:', runForward,
+          '\nalgoLast:', algoLast, '\nbkeyLast:', bkeyLast, '\nphase:', phase )
 else:
     print(dtn(), '[ Begin from scratch (no config file) ]')
 
