@@ -479,7 +479,7 @@ while phase in range(2, 4 + 1):
 
 ## ------------------- Phase 5, 6 - same High and Low byte and Mirror hi/lo byte --------------------- ##
 
-while phase in range(4, 5 + 1):
+while phase in range(5, 6 + 1):
 
     print(dtn(), '[ Phase', phase, '- same High and Low byte ]')
 
@@ -488,10 +488,10 @@ while phase in range(4, 5 + 1):
 
     for bkey in range(bkeyLast, 256):
 
-        if phase == 4:
+        if phase == 5:
             low = bkey
             high = bkey
-        if phase == 5:
+        if phase == 6:
             low = bkey
             high = mirrorByte(bkey)
             if low == high: # skip phase 4 keys
@@ -537,7 +537,7 @@ while phase in range(4, 5 + 1):
     saveCfg()
     time.sleep(powerPause)
 
-## ----------------------------------- Phase 6 - Bruteforce ------------------------------------ ##
+## ----------------------------------- Phase 7 - Bruteforce ------------------------------------ ##
 
 print(dtn(), '[ Phase', phase, '- Bruteforce ]')
 
@@ -550,6 +550,9 @@ for ikey in range(ikeyLast, ikEnd, ikEnc):
         high, low = bytes(ikey)  # high и low in normal order
     else:
         low, high = bytes(ikey)  # high и low changed!
+
+    if phase == 8: # we already did it, and dont find seed key :-( 
+        break
 
     currKey = ((high << 8) + low)
     if (currKey in keyAllgmlan  # check Key repeat in 0-5 phase
@@ -596,7 +599,7 @@ for ikey in range(ikeyLast, ikEnd, ikEnc):
 
 ## ---------------------------------------- Program END ---------------------------------------- ##
 
-phase += 1 # We have't phase 6. So, we can not find Seed Key.
+phase += 1 # We have't phase 8. So, we can not find Seed Key.
 saveCfg()
 clrbCAN()
 powerOff()
