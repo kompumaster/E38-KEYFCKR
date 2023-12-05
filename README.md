@@ -15,7 +15,7 @@ The E38 unit came into my hands after the EEPROM was damaged. The Seed/Key pair 
 
 Features:
 - 2 bytes Seed Key brutforce tester (via J2534 device).
-- Power control - L-Line (pin15). Use [PowerBox](https://megabonus.com/y/plZVk) or [similar devce](https://megabonus.com/y/Cg37z).
+- Power control - L-Line (pin15). Use [PowerBox](https://megabonus.com/y/plZVk) or [similar devce](https://otomotiv-forum.com/attachments/autopower-png.1305/).
 
 
 ![AcDelco E38 Pinout](img/AcDelco_E38_Pinout.png)
