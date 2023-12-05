@@ -42,13 +42,11 @@ Curren progress saves in "history\\%VIN%.last.ini" file.
 
 - PS.  Use Windows and Python 3.12 x32
 - PPS.Code written by my monkey danсing on the keyboard
+- PPPS. Have you found a seed and want to share your joy? ;-)
+- USDT: TQzFrezTpgY7AknMsxMRPsBsAzDi9tHZJ3 (TRC20)
 
 
 Used:
 - [NPYK J2534 modified lib](https://github.com/NPYK/python_j2534)
 - [YustasSwamp gm-seed-key modified to .so](https://github.com/YustasSwamp/gm-seed-key)
 
-
-$ Have you found a seed and want to share your joy? ;-)
-
-- USDT: TQzFrezTpgY7AknMsxMRPsBsAzDi9tHZJ3 (TRC20)
