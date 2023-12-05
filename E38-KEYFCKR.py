@@ -130,6 +130,7 @@ def strMsg(msg, msgLen):  # message to Hex
 
 
 def sendISO(msgTxData, msgNum):  # Send message via ISO
+    clrbISO()
     msgTx = J2534.ptTxMsg(ProtoISO, 0x00000040)
     msgTx.setIDandData(0x07E0, msgTxData)
     J2534.ptWtiteMsgs(chISO, msgTx, 1, 600)
@@ -144,6 +145,7 @@ def sendISO(msgTxData, msgNum):  # Send message via ISO
 
 
 def sendCAN(msgTxData):  # Send message via CAN
+    clrbCAN()
     msgTx = J2534.ptTxMsg(ProtoCAN, 0x00000000)
     msgTx.setIDandData(0x07E0, msgTxData)
     J2534.ptWtiteMsgs(chCAN, msgTx, 1, 600)
@@ -186,10 +188,13 @@ def askSeed():  # Asking the Seed
         print('c', end='')
     print('')
 
+
     print(dtn(), 'ASK SEED ', end='')
 
     aseed = 0
     while aseed == 0:
+
+
         msgRx = sendCAN([0x02, 0x27, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00])
 
         # No data (?)
@@ -210,21 +215,18 @@ def askSeed():  # Asking the Seed
 
         # 00 00 07 e8 03 [7f 27 37] - Time Delay not Expired
         if msgRx.Data[5] == 0x7F and msgRx.Data[6] == 0x27 and msgRx.Data[7] == 0x37:
-            clrbCAN()
             time.sleep(seedPause)
             print('d', end='')
             continue
 
         # 00 00 07 e8 [01 60] aa aa aa aa aa aa - ????
         if msgRx.Data[4] == 0x01 and msgRx.Data[5] == 0x60:
-            clrbCAN()
             time.sleep(seedPause)
             print('o', end='')
             continue
 
         # Oter message
         else:
-            clrbCAN()
             time.sleep(seedPause)
             print('x', end='')
             continue
@@ -233,8 +235,21 @@ def askSeed():  # Asking the Seed
 def tryKey(highK, lowK):
     keyAnswer = False
 
+    print('Key = ', addZ(hex(highK)[2:], 2) + addZ(hex(lowK)[2:], 2), end='')
+
     while not keyAnswer:
+
         msgRx = sendCAN([0x04, 0x27, 0x02, highK, lowK, 0x00, 0x00, 0x00])
+
+        if msgRx.DataSize == 0:
+            print(' !!! no message')
+            powerOff()
+            time.sleep(powerPause)
+            powerOn()
+            time.sleep(powerPause)
+            seed = askSeed()
+            print(dtn(),'Key = ', addZ(hex(highK)[2:], 2) + addZ(hex(lowK)[2:], 2), end='')
+            continue
 
         # 00 00 07 e8 02 [67 02] - Key accepted
         if msgRx.Data[5] == 0x67 and msgRx.Data[6] == 0x02:
@@ -253,7 +268,8 @@ def tryKey(highK, lowK):
         # 00 00 07 e8 03 [7f 27 37] - Time Delay not Expired
         # 00 00 07 e8 03 [7f 27 22] - ?
 
-        print('o', end='')
+        print(' !!! wrong message')
+        print(dtn(),'Key = ', addZ(hex(highK)[2:], 2) + addZ(hex(lowK)[2:], 2), end='')
         clrbCAN()
         time.sleep(seedPause)
         if showErr:
@@ -409,8 +425,8 @@ keyDefault = keyAllgmlan[defaultKeyAlgo]
 ## ---------------------------------- Phase 0 - Default KEY ------------------------------------ ##
 
 if phase == 0:
-    print(dtn(), '[ Phase 0 - Default KEY ]')
-    print(dtn(), 'Default Key = ', hex(keyDefault)[2:], end='')
+    print(dtn(), '[ Phase', phase, '- Default KEY ]')
+    print(dtn(), 'Default ', end='')
     high, low = bytes(keyDefault)
     if tryKey(high, low):
         exit(0)
@@ -424,13 +440,17 @@ if phase == 0:
 ## ---------------------------------- Phase 1 - Seed = KEY ------------------------------------ ##
 
 if phase == 1:
-    print(dtn(), '[ Phase 1 - Seed = KEY ]')
-    print(dtn(), 'Default Key = ', hex(keyDefault)[2:], end='')
+    print(dtn(), '[ Phase', phase, '- Seed = KEY ]')
+
+    powerOn()
+    seed = askSeed()
+
     high, low = bytes(keyDefault)
+    print(dtn(), 'Seed=', end='') # "Seed=Key=
     if tryKey(high, low):
         exit(0)
 
-    phase = 1
+    phase = 2
     clrbCAN()
     powerOff()
     saveCfg()
@@ -469,7 +489,7 @@ while phase in range(2, 4 + 1):
         seed = askSeed()
 
         high, low = bytes(ikey)
-        print(dtn(), 'Algo:', addZ(str(algo), 3), 'KEY: ' + addZ(hex(high)[2:], 2) + addZ(hex(low)[2:], 2), end='')
+        print(dtn(), 'Algo:', addZ(str(algo), 3), ' ', end='')
 
         if tryKey(high, low):
             powerOff()
@@ -528,7 +548,7 @@ while phase in range(5, 6 + 1):
         powerOn()
         seed = askSeed()
 
-        print(dtn(), 'bkey:', addZ(str(bkey), 3), 'KEY: ' + addZ(hex(high)[2:], 2) + addZ(hex(low)[2:], 2), end='')
+        print(dtn(), 'bkey:', addZ(str(bkey), 3), ' ', end='')
 
         if tryKey(high, low):
             clrbCAN()
@@ -590,7 +610,7 @@ for ikey in range(ikeyLast, ikEnd, ikEnc):
     powerOn()
     seed = askSeed()
 
-    print(dtn(), 'KEY: ' + addZ(hex(high)[2:], 2) + addZ(hex(low)[2:], 2), end='')
+    print(dtn(), ' ', end='')
 
     if tryKey(high, low):
         break  # We found it!
