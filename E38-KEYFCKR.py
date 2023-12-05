@@ -235,7 +235,7 @@ def askSeed():  # Asking the Seed
 def tryKey(highK, lowK):
     keyAnswer = False
 
-    print('Key = ', addZ(hex(highK)[2:], 2) + addZ(hex(lowK)[2:], 2), end='')
+    print('Key =', addZ(hex(highK)[2:], 2) + addZ(hex(lowK)[2:], 2), end='')
 
     while not keyAnswer:
 
@@ -445,7 +445,7 @@ if phase == 1:
     powerOn()
     seed = askSeed()
 
-    high, low = bytes(keyDefault)
+    high, low = bytes(seed)
     print(dtn(), 'Seed=', end='') # "Seed=Key=
     if tryKey(high, low):
         exit(0)
@@ -459,13 +459,13 @@ if phase == 1:
 ## --------------------------------- Phase 2-4 - try all algo ---------------------------------- ##
 
 while phase in range(2, 4 + 1):
-    if phase == 1:
+    if phase == 2:
         keyAll = keyAllgmlan
         print(dtn(), '[ Phase', phase, '- try all GMlan algo ]')
-    if phase == 2:
+    if phase == 3:
         keyAll = keyAllclass2
         print(dtn(), '[ Phase', phase, '- try all class2 algo ]')
-    if phase == 3:
+    if phase == 4:
         keyAll = keyAllothers
         print(dtn(), '[ Phase', phase, '- try all other algo ]')
 
@@ -489,7 +489,13 @@ while phase in range(2, 4 + 1):
         seed = askSeed()
 
         high, low = bytes(ikey)
-        print(dtn(), 'Algo:', addZ(str(algo), 3), ' ', end='')
+
+        if phase == 2:
+            print(dtn(), 'Proto: GMlan; Algo: '+ addZ(str(algo), 3) +'; ', end='')
+        if phase == 3:
+            print(dtn(), 'Proto: Class2; Algo: '+ addZ(str(algo), 3) +'; ', end='')
+        if phase == 4:
+            print(dtn(), 'Proto: Others Algo: '+ addZ(str(algo), 3) +'; ', end='')
 
         if tryKey(high, low):
             powerOff()
@@ -548,7 +554,7 @@ while phase in range(5, 6 + 1):
         powerOn()
         seed = askSeed()
 
-        print(dtn(), 'bkey:', addZ(str(bkey), 3), ' ', end='')
+        print(dtn(), 'bkey:', addZ(str(bkey), 3), '; ', end='')
 
         if tryKey(high, low):
             clrbCAN()
