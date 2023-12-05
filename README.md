@@ -22,7 +22,7 @@ Features:
 
 
 Script has 8 phases:
-- **0** - Defaut Key
+- **0** - Defaut Key (gmlan 0x92 algo)
 - **1** - Key = Seed
 - **2** - All algo keys in "gmlan" proto
 - **3** - All algo keys in "class2" proto
