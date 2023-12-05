@@ -49,6 +49,6 @@ Used:
 - [YustasSwamp gm-seed-key modified to .so](https://github.com/YustasSwamp/gm-seed-key)
 
 
-Have you found a seed and want to share your joy? ;-)
+$ Have you found a seed and want to share your joy? ;-)
 
-USDT: TQzFrezTpgY7AknMsxMRPsBsAzDi9tHZJ3 (TRC20)
+- USDT: TQzFrezTpgY7AknMsxMRPsBsAzDi9tHZJ3 (TRC20)
