@@ -47,6 +47,6 @@ Curren progress saves in "history\\%VIN%.last.ini" file.
 
 
 Used:
-- [NPYK J2534 modified lib](https://github.com/NPYK/python_j2534)
-- [YustasSwamp gm-seed-key modified to .so](https://github.com/YustasSwamp/gm-seed-key)
-
+- [NPYK J2534](https://github.com/NPYK/python_j2534) modified lib
+- [YustasSwamp gm-seed-key](https://github.com/YustasSwamp/gm-seed-key) modified to .so
+- [MD Flasher](https://mdflasher.online/catalog/moduli_dlya_programmnogo_kompleksa_mdflasher/litsenziya_090_gm_acdelco_e37_e38_ecu_bench_obdii/) license #90 logs made by [joeyoravec j2534-logger](https://github.com/joeyoravec/j2534-logger)
