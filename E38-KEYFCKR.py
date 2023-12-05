@@ -29,8 +29,8 @@ showErr = False  # Show debug info
 powerPause = 0.5  # pause between power off and on
 seedPause = 0.5  # pause between askSeed commands
 phase = 0  # 0 = default key, 1 = 256 standard algos, 2 = bruteforce
-runForward = False  # Key from 0000 to FFFF, or backward
-swapByte = True  # Swap high and low Key Byte
+runForward = True  # Key from 0000 to FFFF, or backward
+swapByte = False  # Swap high and low Key Byte
 
 cfg = configparser.ConfigParser()
 
@@ -177,13 +177,13 @@ def askSeed():  # Asking the Seed
     print(dtn(), 'Start diag ', end='')
     while not startDiag():  # Wait for start diagnostic
         time.sleep(seedPause)
-        print('.', end='')
+        print('s', end='')
     print('')
 
     print(dtn(), 'Disable comm. ', end='')
     while not disableComm():  # wait for disable communication
         time.sleep(seedPause)
-        print('.', end='')
+        print('c', end='')
     print('')
 
     print(dtn(), 'ASK SEED ', end='')
@@ -192,22 +192,42 @@ def askSeed():  # Asking the Seed
     while aseed == 0:
         msgRx = sendCAN([0x02, 0x27, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00])
 
+        # No data (?)
+        if msgRx.DataSize == 0:
+            print(' !!! no message')
+            powerOff()
+            time.sleep(powerPause)
+            powerOn()
+            time.sleep(powerPause)
+            print(dtn(), 'ASK SEED ', end='')
+            continue
+
         # 00 00 07 e8 04 [67 01] XX XX - Seed
         if msgRx.Data[5] == 0x67 and msgRx.Data[6] == 0x01:
             aseed = msgRx.Data[7] * 256 + msgRx.Data[8]
             print(' = ' + addZ(hex(aseed)[2:], 4))
             return aseed
 
-        # 00 00 07 e8 01 60 aa aa aa aa aa aa - ????
-
         # 00 00 07 e8 03 [7f 27 37] - Time Delay not Expired
         if msgRx.Data[5] == 0x7F and msgRx.Data[6] == 0x27 and msgRx.Data[7] == 0x37:
             clrbCAN()
             time.sleep(seedPause)
-            print('.', end='')
+            print('d', end='')
+            continue
+
+        # 00 00 07 e8 [01 60] aa aa aa aa aa aa - ????
+        if msgRx.Data[4] == 0x01 and msgRx.Data[5] == 0x60:
+            clrbCAN()
+            time.sleep(seedPause)
+            print('o', end='')
+            continue
+
+        # Oter message
         else:
             clrbCAN()
-            print(',', end='')
+            time.sleep(seedPause)
+            print('x', end='')
+            continue
 
 
 def tryKey(highK, lowK):
@@ -233,7 +253,7 @@ def tryKey(highK, lowK):
         # 00 00 07 e8 03 [7f 27 37] - Time Delay not Expired
         # 00 00 07 e8 03 [7f 27 22] - ?
 
-        print('.', end='')
+        print('o', end='')
         clrbCAN()
         time.sleep(seedPause)
         if showErr:
