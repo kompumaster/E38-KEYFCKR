@@ -2,6 +2,7 @@
 
 ##  GM AcDelco E38 ECU KeyFCKR
 ##               by Flash/Tune
+##               t.me/obd2help
 ##
 ## Power control - LLine (pin15)
 ## Use PowerBox or similar devce
@@ -9,7 +10,6 @@
 ## PS. Use x32 Python (3.12)
 ## PPS.Code written by my monkey
 ##       danсing on the keyboard
-##       t.me/obd2help
 
 import configparser
 import datetime
@@ -522,7 +522,7 @@ while phase in range(2, 4 + 1):
         if (algo - algoLastLast + 1) % 5 == 0 and algo > algoLastLast:
             runTime = (time.time() - startTime)
             estSec = (runTime / (algo - algoLastLast + 1) * (256 - algo))
-            print(dtn(), 'Tested now:', (algo - algoLastLast + 1), 'total:', algo + 1, 'keys from', 256)
+            print(dtn(), 'Tested now:', (algo - algoLastLast + 1), 'total:', algo + 1, '/', 256)
             print(dtn(), 'Runing time:', str(datetime.timedelta(seconds=runTime // 1)), end='')
             print(' // Est:', str(datetime.timedelta(seconds=estSec // 1)), '( phase', phase, ')')
 
@@ -582,7 +582,7 @@ while phase in range(5, 6 + 1):
         if (bkey - bkeyLastLast + 1) % 5 == 0 and bkey > bkeyLastLast:
             runTime = (time.time() - startTime)
             estSec = (runTime / (bkey - bkeyLastLast + 1) * (256 - bkey))
-            print(dtn(), 'Tested now:', (bkey - bkeyLastLast + 1), 'total:', bkey + 1, 'keys from', 256)
+            print(dtn(), 'Tested now:', (bkey - bkeyLastLast + 1), 'total:', bkey + 1, '/', 256)
             print(dtn(), 'Runing time:', str(datetime.timedelta(seconds=runTime // 1)), end='')
             print(' // Est:', str(datetime.timedelta(seconds=estSec // 1)), '( phase', phase, ')')
 
@@ -649,10 +649,10 @@ for ikey in range(ikeyLast, ikEnd, ikEnc):
         runTime = (time.time() - startTime)
         if runForward:
             leftSec = (runTime / ikeysPass * (ikEnd - ikey) / ikEnc)
-            print(dtn(), 'Tested now:', ikeysPass, 'total:', ikey + 1, 'keys from', ikEnd + 1)
+            print(dtn(), 'Tested now:', ikeysPass, 'total:', ikey + 1, '/', ikEnd + 1)
         else:
             leftSec = abs(runTime / ikeysPass * (ikey - ikEnd) / ikEnc)
-            print(dtn(), 'Tested now:', ikeysPass, 'total:', ikBeg - ikey + 1, 'keys from', ikBeg + 1)
+            print(dtn(), 'Tested now:', ikeysPass, 'total:', ikBeg - ikey + 1 + 256*5, '/', ikBeg + 1)
 
         print(dtn(), 'Runing time:', str(datetime.timedelta(seconds=runTime // 1)), end='')
         print(' // Left:', str(datetime.timedelta(seconds=leftSec // 1)), '( phase', phase, ')')
