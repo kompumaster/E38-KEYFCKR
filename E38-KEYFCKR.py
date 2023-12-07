@@ -138,7 +138,7 @@ def printECUidStr(name, msg):  # convert ECU id message to string value
     return s
 
 
-def readCfg(cfgFile):  # oh yea, save config
+def readCfg(cfgFile):  # read config
     cfg.read(cfgFile)
     global ikeyLast, ikBeg, ikEnd, ikEnc, swapByte, runForward, algoLast, bkeyLast, phase
     ikeyLast = int(cfg.get('DEFAULT', 'ikeyLast'))
@@ -304,6 +304,7 @@ def tryKey(highK, lowK):
         if msgRx.Data[5] == 0x67 and msgRx.Data[6] == 0x02:
             os.system('color A')
             print(' CORRECT (!!!!!!)')
+            print(end='\a')
             print(dtn(), '<< ' + strMsg(msgRx.Data, msgRx.DataSize))
             keyAnswer = True
             return True
