@@ -16,6 +16,7 @@ import datetime
 import os
 import sys
 import time
+import shutil
 from ctypes import *
 
 import J2534
@@ -156,6 +157,9 @@ def readCfg(cfgFile):  # read config
 
 
 def saveCfg():  # oh yea, save config
+    if os.path.exists(cfgFileName):
+        shutil.copyfile(cfgFileName, 'history\\' + VIN + '.last.bak')
+
     cfg.set('DEFAULT', 'ikeyLast', str(ikeyLast))
     cfg.set('DEFAULT', 'ikBeg', str(ikBeg))
     cfg.set('DEFAULT', 'ikEnd', str(ikEnd))
@@ -164,7 +168,7 @@ def saveCfg():  # oh yea, save config
     cfg.set('DEFAULT', 'algoLast', str(algoLast))
     cfg.set('DEFAULT', 'bkeyLast', str(bkeyLast))
     cfg.set('DEFAULT', 'phase', str(phase))
-    with open('history\\' + VIN + '.last.ini', 'w') as config_file:
+    with open(cfgFileName, 'w') as config_file:
         cfg.write(config_file)
 
 
