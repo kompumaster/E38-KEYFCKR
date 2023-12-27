@@ -11,6 +11,10 @@ def addZ(s, n):
     return s.upper()
 
 
-for algo in range(000, 256):
-    seed = random(0xFF)
-    print(hex(seed)[2:], addZ(hex(algo)[2:], 2), '-', addZ(hex(abs(so.get_key_gmlan(seed, algo)))[2:], 4))
+#for algo in range(000, 256):
+#    seed = random(0xFF)
+#    print(hex(seed)[2:], addZ(hex(algo)[2:], 2), '-', addZ(hex(abs(so.get_key_gmlan(seed, algo)))[2:], 4))
+
+algo = 0x92
+seed = 0x12CC
+print(hex(seed)[2:], addZ(hex(algo)[2:], 2), '-', addZ(hex(abs(so.get_key(seed, algo, 1)))[2:], 4))
